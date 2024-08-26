@@ -134,5 +134,27 @@ namespace NZWalks.API.Controllers
 			return Ok(regionDto);
 		}
 
+		// DELETE A REGION
+		// DELETE: https://localhost:portnumber/api/regions/{id}
+		[HttpDelete]
+		[Route("{id:guid}")]
+		public async Task<IActionResult> Delete([FromRoute] Guid id)
+		{
+			// Find region domain by id
+			var regionDomain = await _dbcontext.Regions.FindAsync(id);
+
+			// check region domain is existed
+			if (regionDomain == null) { 
+				return NotFound();
+			}
+			
+			// remove it from dataset
+			_dbcontext.Regions.Remove(regionDomain);
+
+			// save to the database
+			await _dbcontext.SaveChangesAsync();
+			return NoContent();
+		}
+
 	}
 }
