@@ -23,13 +23,13 @@ namespace NZWalks.API.Repositories.Implements
 
 		public async Task<List<Walk>> GetAllAsync()
 		{
-			var walksDomain = await dbContext.Walks.ToListAsync();
+			var walksDomain = await dbContext.Walks.Include("Difficulty").Include("Region").ToListAsync();
 			return walksDomain;
 		}
 
 		public async Task<Walk?> GetByIdAsync(Guid id)
 		{
-			var walkDomain = await dbContext.Walks.FindAsync(id);
+			var walkDomain = await dbContext.Walks.Include("Difficulty").Include("Region").FirstOrDefaultAsync(w => w.Id == id);
 
 			if (walkDomain == null)
 			{
