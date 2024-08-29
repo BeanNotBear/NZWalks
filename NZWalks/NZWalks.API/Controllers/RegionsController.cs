@@ -60,13 +60,18 @@ namespace NZWalks.API.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Create([FromBody] AddRegionRequestDto addRegionRequestDto)
 		{
-			// Map DTO to Domain model
-			var regionDomainModel = mapper.Map<Region>(addRegionRequestDto);
 
-			// Use Domain Model to create Region
-			regionDomainModel = await regionRepository.CreateAsync(regionDomainModel);
+			if (ModelState.IsValid)
+			{
+				// Map DTO to Domain model
+				var regionDomainModel = mapper.Map<Region>(addRegionRequestDto);
 
-			return CreatedAtAction(nameof(GetById), new { id = regionDomainModel.Id }, mapper.Map<RegionDto>(regionDomainModel));
+				// Use Domain Model to create Region
+				regionDomainModel = await regionRepository.CreateAsync(regionDomainModel);
+
+				return CreatedAtAction(nameof(GetById), new { id = regionDomainModel.Id }, mapper.Map<RegionDto>(regionDomainModel));
+			}
+			return BadRequest(ModelState);
 		}
 
 		// PUT to Update a Region
@@ -76,18 +81,22 @@ namespace NZWalks.API.Controllers
 		public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateRegionRequestDto updateRegionRequestDto)
 		{
 
-			// Map Update Region Request to Region Domain Model
-			var regionDomainModel = mapper.Map<Region>(updateRegionRequestDto);
-
-			// Check Region Domain Model if existed
-			regionDomainModel = await regionRepository.UpdateAsync(id, regionDomainModel);
-			if (regionDomainModel == null)
+			if (ModelState.IsValid)
 			{
-				return NotFound();
-			}
+				// Map Update Region Request to Region Domain Model
+				var regionDomainModel = mapper.Map<Region>(updateRegionRequestDto);
 
-			// Return region dto
-			return Ok(mapper.Map<RegionDto>(regionDomainModel));
+				// Check Region Domain Model if existed
+				regionDomainModel = await regionRepository.UpdateAsync(id, regionDomainModel);
+				if (regionDomainModel == null)
+				{
+					return NotFound();
+				}
+
+				// Return region dto
+				return Ok(mapper.Map<RegionDto>(regionDomainModel));
+			}
+			return BadRequest(ModelState);
 		}
 
 		// DELETE A REGION
