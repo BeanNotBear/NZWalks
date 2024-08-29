@@ -21,9 +21,17 @@ namespace NZWalks.API.Repositories.Implements
 			return walk;
 		}
 
-		public Task DeleteAsync(Guid id)
+		public async Task<Walk?> DeleteAsync(Guid id)
 		{
-			throw new NotImplementedException();
+			var walkDomain = await dbContext.Walks.FindAsync(id);
+			if (walkDomain == null)
+			{
+				return null;
+			}
+
+			dbContext.Walks.Remove(walkDomain);
+			await dbContext.SaveChangesAsync();
+			return walkDomain;
 		}
 
 		public async Task<List<Walk>> GetAllAsync()
