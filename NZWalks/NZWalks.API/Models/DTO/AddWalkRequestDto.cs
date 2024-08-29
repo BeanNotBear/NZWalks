@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using NZWalks.API.CustomActionFilters;
+using System.ComponentModel.DataAnnotations;
 
 namespace NZWalks.API.Models.DTO
 {
@@ -18,9 +19,11 @@ namespace NZWalks.API.Models.DTO
 		public string? WalkImageUrl { get; set; }
 
 		[Required]
+		[RegionIdExists]
 		public Guid RegionId { get; set; }
 
 		[Required]
+		[DifficultyIdExists]
 		public Guid DifficultyId { get; set; }
 	}
 }
