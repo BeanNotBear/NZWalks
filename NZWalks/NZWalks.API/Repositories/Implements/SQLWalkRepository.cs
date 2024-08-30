@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NZWalks.API.Data;
 using NZWalks.API.Models.Domain;
+using NZWalks.API.Models.DTO;
+using System.Text.RegularExpressions;
 
 namespace NZWalks.API.Repositories.Implements
 {
@@ -34,10 +36,45 @@ namespace NZWalks.API.Repositories.Implements
 			return walkDomain;
 		}
 
-		public async Task<List<Walk>> GetAllAsync()
+		public async Task<PaginatedList<Walk>> GetAllAsync(QueryParameters queryParameters)
 		{
-			var walksDomain = await dbContext.Walks.Include("Difficulty").Include("Region").ToListAsync();
-			return walksDomain;
+			var walksDomain = dbContext.Walks.Include("Difficulty").Include("Region").AsQueryable();
+
+			// Filtering by Name
+			if (!string.IsNullOrWhiteSpace(queryParameters.Name))
+			{
+				walksDomain = walksDomain.Where(x => x.Name == queryParameters.Name);
+			}
+
+			// Filtering by range of length
+			if (queryParameters.MinLength != null && queryParameters.MaxLength != null)
+			{
+				walksDomain = walksDomain.Where(x => (x.LengthInKm >= queryParameters.MinLength && x.LengthInKm <= queryParameters.MaxLength));
+			}
+
+			// Sorting
+			if (!string.IsNullOrWhiteSpace(queryParameters.SortBy))
+			{
+				if (queryParameters.SortBy.Equals("Name", StringComparison.OrdinalIgnoreCase))
+				{
+					walksDomain = queryParameters.IsAscending ? walksDomain.OrderBy(x => x.Name) : walksDomain.OrderByDescending(x => x.Name);
+				}
+				else if (queryParameters.SortBy.Equals("Length", StringComparison.OrdinalIgnoreCase))
+				{
+					walksDomain = queryParameters.IsAscending ? walksDomain.OrderBy(x => x.LengthInKm) : walksDomain.OrderByDescending(x => x.LengthInKm);
+				}
+
+			}
+
+			// Pagination
+			var skipResult = (queryParameters.PageNumber - 1) * queryParameters.PageSize;
+
+			var numberOfRecords = await walksDomain.CountAsync();
+			var totalPage = (int)Math.Ceiling((double)numberOfRecords / queryParameters.PageSize);
+			var items = await walksDomain.Skip(skipResult).Take(queryParameters.PageSize).ToListAsync();
+
+			var result = new PaginatedList<Walk>(items, queryParameters.PageNumber, totalPage);
+			return result;
 		}
 
 		public async Task<Walk?> GetByIdAsync(Guid id)
