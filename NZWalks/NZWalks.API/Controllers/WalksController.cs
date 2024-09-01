@@ -25,7 +25,7 @@ namespace NZWalks.API.Controllers
 		}
 
 		// CREATE Walk
-		// POST: /api/Walks
+		// POST: /api/walks
 		[HttpPost]
 		[ValidateModel]
 		public async Task<IActionResult> Create([FromBody] AddWalkRequestDto addWalkRequestDto)
