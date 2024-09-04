@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using NZWalks.API.Models.DTO;
 using NZWalks.API.Repositories;
+using NZWalks.API.Services;
+using NZWalks.API.Services.Implements;
 
 namespace NZWalks.API.Controllers
 {
@@ -12,11 +14,13 @@ namespace NZWalks.API.Controllers
 
 		private readonly UserManager<IdentityUser> userManager;
 		private readonly ITokenRepository tokenRepository;
+		private readonly IEmailService emailService;
 
-		public AuthController(UserManager<IdentityUser> userManager, ITokenRepository tokenRepository)
+		public AuthController(UserManager<IdentityUser> userManager, ITokenRepository tokenRepository, IEmailService emailService)
 		{
 			this.userManager = userManager;
 			this.tokenRepository = tokenRepository;
+			this.emailService = emailService;
 		}
 
 		// POST: /api/Auth/Register
@@ -41,12 +45,20 @@ namespace NZWalks.API.Controllers
 
 					if (identityResult.Succeeded)
 					{
+						await SendConfirmationEmail(registerRequestDto.Username, identityUser);
 						return Ok("User was registered! Please login.");
 					}
 				}
 
 			}
 			return BadRequest("Something went wrong!");
+		}
+
+		private async Task SendConfirmationEmail(string? email, IdentityUser? user)
+		{
+			var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+			var confirmationLink = $"http://localhost:3000/confirm-email?UserId={user.Id}&Token={token}";
+			await emailService.SendEmailAsync(email, "Confirm Your Email", $"Please confirm your account by <a href='{confirmationLink}'>clicking here</a>;.");
 		}
 
 		[HttpPost]

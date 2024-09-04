@@ -8,6 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
+using NZWalks.API.Services;
+using NZWalks.API.Services.Implements;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +64,9 @@ builder.Services.AddDbContext<NZWalksAuthDbContext>(options =>
 builder.Services.AddScoped<IRegionRepository, SQLRegionRepository>();
 builder.Services.AddScoped<IWalkRepository, SQLWalkRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+
+// Create new instance when requesting
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 // Auto mapper
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
