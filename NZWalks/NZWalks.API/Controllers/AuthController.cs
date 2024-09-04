@@ -4,6 +4,7 @@ using NZWalks.API.Models.DTO;
 using NZWalks.API.Repositories;
 using NZWalks.API.Services;
 using NZWalks.API.Services.Implements;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NZWalks.API.Controllers
 {
@@ -57,7 +58,7 @@ namespace NZWalks.API.Controllers
 		private async Task SendConfirmationEmail(string? email, IdentityUser? user)
 		{
 			var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-			var confirmationLink = $"http://localhost:3000/confirm-email?UserId={user.Id}&Token={token}";
+			var confirmationLink = $"https://localhost:7076/api/Auth/ConfirmEmail?UserId={user.Id}&Token={token}";
 			await emailService.SendEmailAsync(email, "Confirm Your Email", $"Please confirm your account by <a href='{confirmationLink}'>clicking here</a>;.");
 		}
 
@@ -91,5 +92,29 @@ namespace NZWalks.API.Controllers
 			return BadRequest("Username or password incorrect!");
 		}
 
+		[HttpGet]
+		[Route("ConfirmEmail")]
+		[AllowAnonymous]
+		public async Task<IActionResult> ConfirmEmail(string userId, string token)
+		{
+			if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
+			{
+				return BadRequest("User ID and Token are required");
+			}
+
+			var user = await userManager.FindByIdAsync(userId);
+			if (user == null)
+			{
+				return BadRequest("Invalid User ID");
+			}
+			token = token.Replace(" ", "+");
+			var result = await userManager.ConfirmEmailAsync(user, token);
+			if (result.Succeeded)
+			{
+				return Ok("Email confirmed successfully!");
+			}
+
+			return BadRequest("Email confirmation failed");
+		}
 	}
 }
