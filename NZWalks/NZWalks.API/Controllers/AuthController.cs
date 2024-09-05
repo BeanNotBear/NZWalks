@@ -75,17 +75,29 @@ namespace NZWalks.API.Controllers
 
 				if (isCorrectPassword)
 				{
-					// Create token
-					var roles = await userManager.GetRolesAsync(user);
+					var isConfirm = await userManager.IsEmailConfirmedAsync(user);
 
-					var jwtToken = tokenRepository.CreateJwtToken(user, roles.ToList());
-
-					var loginResponse = new LoginResponseDto
+					if (isConfirm)
 					{
-						JwtToken = jwtToken
-					};
+						// Create token
+						var roles = await userManager.GetRolesAsync(user);
 
-					return Ok(loginResponse);
+						var jwtToken = tokenRepository.CreateJwtToken(user, roles.ToList());
+
+						var loginResponse = new LoginResponseDto
+						{
+							JwtToken = jwtToken
+						};
+
+						return Ok(loginResponse);
+					}
+					else
+					{
+						await SendConfirmationEmail(user.Email, user);
+						return Ok("Email must be confirm first!");
+					}
+
+
 				}
 			}
 
@@ -111,7 +123,17 @@ namespace NZWalks.API.Controllers
 			var result = await userManager.ConfirmEmailAsync(user, token);
 			if (result.Succeeded)
 			{
-				return Ok("Email confirmed successfully!");
+				// Create token
+				var roles = await userManager.GetRolesAsync(user);
+
+				var jwtToken = tokenRepository.CreateJwtToken(user, roles.ToList());
+
+				var loginResponse = new LoginResponseDto
+				{
+					JwtToken = jwtToken
+				};
+
+				return Ok(loginResponse);
 			}
 
 			return BadRequest("Email confirmation failed");
