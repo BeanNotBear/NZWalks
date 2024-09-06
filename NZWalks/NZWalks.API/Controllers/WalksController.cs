@@ -41,6 +41,8 @@ namespace NZWalks.API.Controllers
 		[HttpGet]
 		public async Task<IActionResult> GetAll([FromQuery] QueryParameters queryParameters)
 		{
+			// Create an exception
+			throw new Exception("Test middleware");
 			var walksDomain = await walkRepository.GetAllAsync(queryParameters);
 			var apiResponse = new APIResponse(true, "OK", mapper.Map<PaginatedList<WalkDto>>(walksDomain));
 			return Ok(apiResponse);
