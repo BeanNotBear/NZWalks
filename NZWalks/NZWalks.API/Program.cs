@@ -12,10 +12,18 @@ using NZWalks.API.Services;
 using NZWalks.API.Services.Implements;
 using System.Net.NetworkInformation;
 using Microsoft.Extensions.FileProviders;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var logger = new LoggerConfiguration()
+	.WriteTo.Console()
+	.MinimumLevel.Information()
+	.CreateLogger();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
@@ -117,6 +125,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
+// middleware to view static file
 app.UseStaticFiles(new StaticFileOptions
 {
 	FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Images")),
