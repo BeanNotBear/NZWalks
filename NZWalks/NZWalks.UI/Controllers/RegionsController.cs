@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NZWalks.UI.Models.DTO;
+using System.Text;
+using System.Text.Json;
 
 namespace NZWalks.UI.Controllers
 {
@@ -14,6 +16,7 @@ namespace NZWalks.UI.Controllers
 			this.configuration = configuration;
 		}
 
+		[HttpGet]
 		public async Task<IActionResult> Index()
 		{
 			List<RegionDto> response = new List<RegionDto>();
@@ -26,7 +29,7 @@ namespace NZWalks.UI.Controllers
 
 				httpResponseMessage.EnsureSuccessStatusCode();
 
-				response.AddRange(await httpResponseMessage.Content.ReadFromJsonAsync<IEnumerable<RegionDto>>());  
+				response.AddRange(await httpResponseMessage.Content.ReadFromJsonAsync<IEnumerable<RegionDto>>());
 			}
 			catch (Exception ex)
 			{
@@ -35,5 +38,38 @@ namespace NZWalks.UI.Controllers
 
 			return View(response);
 		}
+
+		[HttpGet]
+		public async Task<IActionResult> Add()
+		{
+			return View();
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Add(AddRegionViewModel addRegionViewModel)
+		{
+			var client = httpClientFactory.CreateClient();
+
+			var httpRequestMessage = new HttpRequestMessage()
+			{
+				Method = HttpMethod.Post,
+				RequestUri = new Uri(configuration["Api:GetAllRegions"]),
+				Content = new StringContent(JsonSerializer.Serialize(addRegionViewModel), Encoding.UTF8, "application/json"),
+			};
+
+			var httpResponseMessage = await client.SendAsync(httpRequestMessage);
+
+			httpResponseMessage.EnsureSuccessStatusCode();
+
+			var response = await httpResponseMessage.Content.ReadFromJsonAsync<RegionDto>();
+			
+			if(response is not null)
+			{
+				return RedirectToAction("Index", "Regions");
+			}
+
+			return View();
+		}
+
 	}
 }
