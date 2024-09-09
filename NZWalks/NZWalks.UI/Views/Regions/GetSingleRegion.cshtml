@@ -1,0 +1,23 @@
+﻿@model NZWalks.UI.Models.DTO.RegionDto
+
+@{
+}
+
+
+@if (Model is not null)
+{
+	<h1 class="mt-3">Region Details</h1>
+	<div class="card" style="width: 18rem;">
+		<img class="card-img-top" src="@Model.RegionImageUrl" alt="Card image cap">
+		<div class="card-body">
+			<h4 class="card-title">@Model.Id</h4>
+			<h5 class="card-subtitle">@Model.Code</h5>
+			<p class="card-text">@Model.Name</p>
+			<a href="#" class="btn btn-primary">Edit</a>
+		</div>
+	</div>
+}
+else
+{
+	<h1 class="mt-3">404 Not Found</h1>
+}

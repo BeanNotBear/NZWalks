@@ -25,7 +25,7 @@ namespace NZWalks.UI.Controllers
 				// Get all Regions from Web API
 				var client = httpClientFactory.CreateClient();
 
-				var httpResponseMessage = await client.GetAsync(configuration["Api:GetAllRegions"]);
+				var httpResponseMessage = await client.GetAsync("https://localhost:7076/api/Regions");
 
 				httpResponseMessage.EnsureSuccessStatusCode();
 
@@ -53,7 +53,7 @@ namespace NZWalks.UI.Controllers
 			var httpRequestMessage = new HttpRequestMessage()
 			{
 				Method = HttpMethod.Post,
-				RequestUri = new Uri(configuration["Api:GetAllRegions"]),
+				RequestUri = new Uri("https://localhost:7076/api/Regions"),
 				Content = new StringContent(JsonSerializer.Serialize(addRegionViewModel), Encoding.UTF8, "application/json"),
 			};
 
@@ -62,14 +62,29 @@ namespace NZWalks.UI.Controllers
 			httpResponseMessage.EnsureSuccessStatusCode();
 
 			var response = await httpResponseMessage.Content.ReadFromJsonAsync<RegionDto>();
-			
-			if(response is not null)
+
+			if (response is not null)
 			{
 				return RedirectToAction("Index", "Regions");
 			}
 
 			return View();
 		}
+
+		[HttpGet]
+		[Route("{id:guid}")]
+		public async Task<IActionResult> GetSingleRegion(Guid id)
+		{
+			var client = httpClientFactory.CreateClient();
+
+			var response = await client.GetFromJsonAsync<RegionDto>($"https://localhost:7076/api/Regions/{id.ToString()}");
+			if (response is not null)
+			{
+				return View(response);
+			}
+
+            return View(null);
+        }
 
 	}
 }
