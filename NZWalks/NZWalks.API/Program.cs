@@ -61,6 +61,13 @@ builder.Services.AddSwaggerGen(options =>
 	});
 });
 
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("AllowAll", builder =>
+	{
+		builder.AllowAnyMethod();
+	});
+});
 
 // DI db context
 builder.Services.AddDbContext<NZWalksDbContext>(options =>

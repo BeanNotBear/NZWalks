@@ -7,7 +7,7 @@
 <form method="post" class="mt-3">
 	<div class="mt-3">
 		<label class="form-lable">Id: </label>
-		<input type="text" name="id" class="form-control" value="@Model.Id" />
+		<input readonly type="text" name="id" class="form-control" asp-route="@Model.Id" value="@Model.Id" />
 		<label class="form-lable">Code: </label>
 		<input type="text" name="code" class="form-control" asp-for="Code" value="@Model.Code"/>
 		<label class="form-lable">Name: </label>

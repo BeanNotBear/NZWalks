@@ -68,7 +68,7 @@ namespace NZWalks.UI.Controllers
 				return RedirectToAction("Index", "Regions");
 			}
 
-			return View();
+			return NotFound();
 		}
 
 		[HttpGet]
@@ -98,11 +98,31 @@ namespace NZWalks.UI.Controllers
 			return View(null);
 		}
 
-		//[HttpPut]
-		//public async Task<IActionResult> Update(Guid id, RegionDto regionDto)
-		//{
+		[HttpPost]
+		public async Task<IActionResult> Update(Guid id, UpdateRegionViewModel updateRegionViewModel)
+		{
+			var client = httpClientFactory.CreateClient();
 
-		//}
+			var httpRequestMessage = new HttpRequestMessage
+			{
+				RequestUri = new Uri($"https://localhost:7076/api/Regions/{id.ToString()}"),
+				Method = HttpMethod.Put,
+				Content = new StringContent(JsonSerializer.Serialize(updateRegionViewModel), Encoding.UTF8, "application/json")
+			};
+
+			var httpResponseMessage = await client.SendAsync(httpRequestMessage);
+
+			httpResponseMessage.EnsureSuccessStatusCode();
+
+			var response = httpResponseMessage.Content.ReadFromJsonAsync<RegionDto>();
+
+			if (response is not null)
+			{
+				return RedirectToAction("GetSingleRegion", "Regions", new { @id = id });
+            }
+
+			return View();
+        }
 
 	}
 }
