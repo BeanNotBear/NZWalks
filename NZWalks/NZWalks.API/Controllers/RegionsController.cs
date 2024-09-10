@@ -106,7 +106,7 @@ namespace NZWalks.API.Controllers
 		// DELETE: https://localhost:portnumber/api/regions/{id}
 		[HttpDelete]
 		[Route("{id:guid}")]
-		[Authorize(Roles = "Writer")]
+		//[Authorize(Roles = "Writer")]
 		public async Task<IActionResult> Delete([FromRoute] Guid id)
 		{
 			// Find region domain by id

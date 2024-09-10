@@ -119,10 +119,27 @@ namespace NZWalks.UI.Controllers
 			if (response is not null)
 			{
 				return RedirectToAction("GetSingleRegion", "Regions", new { @id = id });
-            }
+			}
 
 			return View();
-        }
+		}
 
+		[HttpGet]
+		public async Task<IActionResult> Delete(Guid id)
+		{
+			var client = httpClientFactory.CreateClient();
+
+			var httpRequestMessage = new HttpRequestMessage
+			{
+				RequestUri = new Uri($"https://localhost:7076/api/Regions/{id.ToString()}"),
+				Method = HttpMethod.Delete,
+			};
+
+			var httpResponseMessage = await client.SendAsync(httpRequestMessage);
+
+			httpResponseMessage.EnsureSuccessStatusCode();
+
+			return RedirectToAction("Index", "Regions");
+		}
 	}
 }

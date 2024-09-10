@@ -14,6 +14,7 @@
 			<h5 class="card-subtitle">@Model.Code</h5>
 			<p class="card-text">@Model.Name</p>
 			<a asp-controller="Regions" asp-action="Update" class="btn btn-primary" asp-route-id="@Model.Id">Edit</a>
+			<a asp-controller="Regions" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
 		</div>
 	</div>
 }
