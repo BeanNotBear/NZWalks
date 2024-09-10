@@ -72,7 +72,6 @@ namespace NZWalks.UI.Controllers
 		}
 
 		[HttpGet]
-		[Route("{id:guid}")]
 		public async Task<IActionResult> GetSingleRegion(Guid id)
 		{
 			var client = httpClientFactory.CreateClient();
@@ -83,8 +82,27 @@ namespace NZWalks.UI.Controllers
 				return View(response);
 			}
 
-            return View(null);
-        }
+			return View(null);
+		}
+
+		[HttpGet]
+		public async Task<IActionResult> Update(Guid id)
+		{
+			var client = httpClientFactory.CreateClient();
+			var response = await client.GetFromJsonAsync<RegionDto>($"https://localhost:7076/api/Regions/{id.ToString()}");
+			if (response is not null)
+			{
+				return View(response);
+			}
+
+			return View(null);
+		}
+
+		//[HttpPut]
+		//public async Task<IActionResult> Update(Guid id, RegionDto regionDto)
+		//{
+
+		//}
 
 	}
 }

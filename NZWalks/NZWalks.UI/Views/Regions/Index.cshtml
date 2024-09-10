@@ -17,7 +17,7 @@
 			<th scope="col">Id</th>
 			<th scope="col">Code</th>
 			<th scope="col">Name</th>
-			<th scope="col">Image</th>
+			<th scope="col">Action</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -27,7 +27,10 @@
 				<td>@region.Id</td>
 				<td>@region.Code</td>
 				<td>@region.Name</td>
-				<td><a asp-controller="Regions" asp-action="GetSingleRegion" asp-route-id="@region.Id" class="btn btn-secondary">View Detail</a></td>
+				<td>
+					<a asp-controller="Regions" asp-action="GetSingleRegion" asp-route-id="@region.Id" class="btn btn-secondary">View Detail</a>
+					<a asp-controller="Regions" asp-action="Update" asp-route-id="@region.Id" class="btn btn-primary">Edit</a>
+				</td>
 			</tr>
 		}
 	</tbody>
